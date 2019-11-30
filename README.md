@@ -1,4 +1,4 @@
-<img src="icon.png" align="right" height="144px" width="144px" />
+<img src="icon.png" align="right" height="175px" width="175px" />
 
 # Awesome README
 > RoR2 Mod which reduces game times by speeding up progression in a variety of ways
