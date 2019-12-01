@@ -12,6 +12,7 @@ namespace FasterGames
         public BepInEx.Logging.ManualLogSource pluginLogger;
         public void IncreaseSpawnRate()
         {
+            // Dunno if this is actually working...
             On.RoR2.CombatDirector.Simulate += (orig, self, deltaTime) =>
             {
                 self.minSeriesSpawnInterval = 2f; // Default is 0.1
