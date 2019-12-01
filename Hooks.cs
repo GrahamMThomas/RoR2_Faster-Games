@@ -25,7 +25,7 @@ namespace FasterGames
             On.RoR2.CombatDirector.Simulate += (orig, self, deltaTime) =>
             {
                 self.expRewardCoefficient = new float();
-                self.expRewardCoefficient = 0.75f; // Default is 0.2
+                self.expRewardCoefficient = 0.5f + Run.instance.participatingPlayerCount * 0.25f; // Default is 0.2
                 orig(self, deltaTime);
             };
         }
@@ -35,7 +35,7 @@ namespace FasterGames
             On.RoR2.CombatDirector.Simulate += (orig, self, deltaTime) =>
             {
                 self.creditMultiplier = new float();
-                self.creditMultiplier = 3f; // Default is 1
+                self.creditMultiplier = 2f + Run.instance.participatingPlayerCount * 0.5f; // Default is 1
                 orig(self, deltaTime);
             };
         }
@@ -71,7 +71,7 @@ namespace FasterGames
             Color DifficultyColor = new Color(0.94f, 0.51f, 0.15f);
 
             DifficultyDef FasterDef = new DifficultyDef(
-                            7.5f, // 0 is Normal mode. 2.5f is 50% which is monsoon
+                            8f, // 0 is Normal mode. 2.5f is 50% which is monsoon
                             "Faster",
                             ":Assets/FasterGames/DifficultyIcon.png",
                             "Gotta go Faster!",
@@ -84,7 +84,7 @@ namespace FasterGames
         {
             On.RoR2.ClassicStageInfo.Awake += (On.RoR2.ClassicStageInfo.orig_Awake orig, ClassicStageInfo self) =>
             {
-                self.sceneDirectorInteractibleCredits = 800; // Default is 200
+                self.sceneDirectorInteractibleCredits = Run.instance.participatingPlayerCount * 500; // Default is 200
                 orig(self);
             };
         }
