@@ -85,7 +85,7 @@ namespace FasterGames
         {
             On.RoR2.ClassicStageInfo.Awake += (On.RoR2.ClassicStageInfo.orig_Awake orig, ClassicStageInfo self) =>
             {
-                self.sceneDirectorInteractibleCredits = Run.instance.participatingPlayerCount * 500; // Default is 200
+                self.sceneDirectorInteractibleCredits = 400 + Run.instance.participatingPlayerCount * 200; // Default is 200
                 orig(self);
             };
         }
