@@ -18,6 +18,11 @@ Games should be about 2.5x-3x faster.
 - Increase Difficulty Scaling
 - Increase Chest Spawn Rates
 
+## Recommended Mods
+- Infinite Chance (Set maximum items in config to ~5)
+- Faster Teleport Charge
+- Faster 3d printers
+
 ## Todo
 - Publish
-- Balance with multiple players.
+- Work on Balancing

@@ -5,9 +5,6 @@ using R2API.Utils;
 
 namespace FasterGames
 {
-    /* Todo:
-     *      
-    */
     [R2APISubmoduleDependency("AssetPlus")]
     [BepInDependency("com.bepis.r2api")]
     [BepInPlugin("com.CwakrJax.FasterGames", "FasterGames", "0.0.1")]
