@@ -1,6 +1,6 @@
 <img src="icon.png" align="right" height="175px" width="175px" />
 
-# RoR2 FasterGames Mod  [![Plugin Version](https://img.shields.io/github/v/release/GrahamMThomas/RoR2_Faster-Games?label=plugin-version)](https://github.com/GrahamMThomas/RoR2_Faster-Games/releases)
+# RoR2 FasterGames Mod  [![Plugin Version](https://img.shields.io/github/v/release/GrahamMThomas/RoR2_Faster-Games?label=latest-version)](https://github.com/GrahamMThomas/RoR2_Faster-Games/releases)
 > RoR2 Mod which reduces game times by speeding up progression in a variety of ways
 
 This game is a blast, but in my opinion, it takes too much time to spin up. I don't have that much time in the day; thus FasterGames mod was created.
