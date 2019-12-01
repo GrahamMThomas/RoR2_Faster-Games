@@ -36,7 +36,7 @@ namespace FasterGames
             On.RoR2.CombatDirector.Simulate += (orig, self, deltaTime) =>
             {
                 self.creditMultiplier = new float();
-                self.creditMultiplier = 2f + Run.instance.participatingPlayerCount * 0.5f; // Default is 1
+                self.creditMultiplier = 1.5f + Run.instance.participatingPlayerCount * 0.5f; // Default is 1
                 orig(self, deltaTime);
             };
         }
@@ -51,8 +51,8 @@ namespace FasterGames
                     CharacterBody body = obj.GetComponent<CharacterBody>();
                     if (body)
                     {
-                        body.baseMoveSpeed = 12.5f; // Default is 7
-                    }
+                        body.baseMoveSpeed = 10f; // Default is 7
+                    } 
                     else
                     {
                         pluginLogger.LogInfo("The prefab loaded has no character body");
@@ -85,7 +85,7 @@ namespace FasterGames
         {
             On.RoR2.ClassicStageInfo.Awake += (On.RoR2.ClassicStageInfo.orig_Awake orig, ClassicStageInfo self) =>
             {
-                self.sceneDirectorInteractibleCredits = 400 + Run.instance.participatingPlayerCount * 200; // Default is 200
+                self.sceneDirectorInteractibleCredits = 400 + (Run.instance.participatingPlayerCount * 100); // Default is 200
                 orig(self);
             };
         }
