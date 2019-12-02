@@ -26,7 +26,7 @@ namespace FasterGames
             On.RoR2.CombatDirector.Simulate += (orig, self, deltaTime) =>
             {
                 self.expRewardCoefficient = new float();
-                self.expRewardCoefficient = 0.5f + Run.instance.participatingPlayerCount * 0.25f; // Default is 0.2
+                self.expRewardCoefficient = 0.5f + Run.instance.participatingPlayerCount * 0.1f; // Default is 0.2
                 orig(self, deltaTime);
             };
         }
@@ -72,7 +72,7 @@ namespace FasterGames
             Color DifficultyColor = new Color(0.94f, 0.51f, 0.15f);
 
             DifficultyDef FasterDef = new DifficultyDef(
-                            8f, // 0 is Normal mode. 2.5f is 50% which is monsoon
+                            9f, // 0 is Normal mode. 2.5f is 50% which is monsoon
                             "Faster",
                             ":Assets/FasterGames/DifficultyIcon.png",
                             "Gotta go Faster!",
