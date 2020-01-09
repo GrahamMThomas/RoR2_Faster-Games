@@ -5,7 +5,7 @@ using R2API.Utils;
 
 namespace FasterGames
 {
-    [R2APISubmoduleDependency("AssetPlus")]
+    [R2APISubmoduleDependency("AssetPlus", "SurvivorAPI", "DifficultyAPI")]
     [BepInDependency("com.bepis.r2api")]
     [BepInPlugin("com.CwakrJax.FasterGames", "FasterGames", "0.0.1")]
     public class FasterGames : BaseUnityPlugin
