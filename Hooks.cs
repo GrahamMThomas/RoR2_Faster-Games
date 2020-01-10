@@ -43,7 +43,7 @@ namespace FasterGames
 
         public void IncreaseBaseStats()
         {
-            foreach (string bodyName in new string[] { "CommandoBody", "ToolbotBody", "HuntressBody", "EngiBody", "MageBody", "MercBody", "TreebotBody", "LoaderBody" })
+            foreach (string bodyName in new string[] { "CommandoBody", "ToolbotBody", "HuntressBody", "EngiBody", "MageBody", "MercBody", "TreebotBody", "LoaderBody", "CrocoBody" })
             {
                 GameObject obj = Resources.Load<GameObject>($"Prefabs/CharacterBodies/{bodyName}");
                 if (obj)
