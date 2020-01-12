@@ -9,6 +9,8 @@ The mod tinkers with increasing a few attributes to make looting quicker while i
 
 Games should be about 2.5x-3x faster.
 
+Make sure you select `Faster` difficulty before playing with this mod.
+
 
 ## Game modifications
 - Spawn rate increase
@@ -24,5 +26,5 @@ Games should be about 2.5x-3x faster.
 - Faster 3d printers
 
 ## Todo
-- Publish
+- Add icon to difficulty
 - Work on Balancing
