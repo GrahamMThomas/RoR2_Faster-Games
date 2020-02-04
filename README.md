@@ -9,7 +9,7 @@ The mod tinkers with increasing a few attributes to make looting quicker while i
 
 Games should be about 2.5x-3x faster.
 
-Make sure you select `Faster` difficulty before playing with this mod.
+Make sure you select `Faster` difficulty before playing with this mod. All members of your party must have the mod installed.
 
 
 ## Game modifications
