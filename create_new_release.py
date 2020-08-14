@@ -9,7 +9,7 @@ print("Minor 0.X.0 = 2")
 print("Patch 0.0.X = 3")
 answer = input("Answer: ")
 
-last_release_name = os.listdir('releases')[0]
+last_release_name = os.listdir('releases')[1]
 v_nums = re.match(r"faster\-games_(\d+)\-(\d+)\-(\d+)", last_release_name).groups()
 
 # Create new release name

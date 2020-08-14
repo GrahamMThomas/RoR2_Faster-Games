@@ -1,15 +1,20 @@
-﻿using R2API;
+﻿//using R2API;
+
+using R2API.Utils;
 using RoR2;
-using BepInEx;
+//using BepInEx;
 using UnityEngine;
-using MonoMod.Cil;
+//using MonoMod.Cil;
 using System;
+using System.Collections.ObjectModel;
 
 namespace FasterGames
 {
     public class Hooks
     {
         public BepInEx.Logging.ManualLogSource pluginLogger;
+        public static ObservableCollection<DifficultyDef> difficultyDefinitions = new ObservableCollection<DifficultyDef>();
+        public static event EventHandler DifficultyCatalogReady;
         public void IncreaseSpawnRate()
         {
             // Dunno if this is actually working...
@@ -43,7 +48,7 @@ namespace FasterGames
 
         public void IncreaseBaseStats()
         {
-            foreach (string bodyName in new string[] { "CommandoBody", "ToolbotBody", "HuntressBody", "EngiBody", "MageBody", "MercBody", "TreebotBody", "LoaderBody", "CrocoBody" })
+                foreach (string bodyName in new string[] { "CommandoBody", "ToolbotBody", "HuntressBody", "EngiBody", "MageBody", "MercBody", "TreebotBody", "LoaderBody", "CrocoBody", "CaptainBody" })
             {
                 GameObject obj = Resources.Load<GameObject>($"Prefabs/CharacterBodies/{bodyName}");
                 if (obj)
@@ -72,13 +77,16 @@ namespace FasterGames
             Color DifficultyColor = new Color(0.94f, 0.51f, 0.15f);
 
             DifficultyDef FasterDef = new DifficultyDef(
-                            9f, // 0 is Normal mode. 2.5f is 50% which is monsoon
+                            9f, //0 is Normal mode. 2.5f is 50% which is monsoon
                             "Faster",
                             ":Assets/FasterGames/DifficultyIcon.png",
                             "Gotta go Faster!",
-                            DifficultyColor
+                            DifficultyColor,
+                            "Hurr Durr Dunno what to put here",
+                            false
                             );
             DifficultyIndex DelugeIndex = R2API.DifficultyAPI.AddDifficulty(FasterDef);
+            pluginLogger.LogInfo(DelugeIndex);
         }
 
         public void IncreaseChestSpawnRate()
