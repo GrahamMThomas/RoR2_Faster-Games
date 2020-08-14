@@ -20,7 +20,6 @@ Make sure you select `Faster` difficulty before playing with this mod. All membe
 - Increase Difficulty Scaling
 - Increase Chest Spawn Rates
 - Increase Teleporter Charge Rate
-- Removes cooldown on 3d printers
 - Overhauled Chance Shrine
 	- 5 items
 	- Scaling per use increased

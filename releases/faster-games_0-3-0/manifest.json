@@ -3,5 +3,5 @@
     "version_number": "0.3.0",
     "website_url": "https://github.com/GrahamMThomas/RoR2_Faster-Games",
     "description": "Games take to long? Runs are 3x faster! Completely destroying the balance of the original game.",
-    "dependencies": []
+    "dependencies": ["tristanmcpherson-R2API-2.4.29", "bbepis-BepInExPack-5.3.1"]
 }

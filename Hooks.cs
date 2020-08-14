@@ -1,4 +1,4 @@
-﻿using R2API.Utils;
+﻿//using R2API.Utils;
 using RoR2;
 using UnityEngine;
 //using MonoMod.Cil;
@@ -140,7 +140,8 @@ namespace FasterGames
             On.RoR2.ShrineChanceBehavior.AddShrineStack += (orig, self, interactor) =>
             {
                 orig(self, interactor);
-                self.SetFieldValue("refreshTimer", 0f);
+                HarmonyLib.AccessTools.Field(HarmonyLib.AccessTools.TypeByName("RoR2.ShrineChanceBehavior"), "refreshTimer").SetValue(self, 0f);
+                //self.SetFieldValue("refreshTimer", 0f);
             };
         }
 

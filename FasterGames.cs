@@ -7,8 +7,7 @@ using UnityEngine;
 namespace FasterGames
 {
     //[R2APISubmoduleDependency("DifficultyAPI")]
-    [BepInDependency("com.bepis.r2api")]
-    [BepInDependency("com.Elysium.Fast3D")]
+    //[BepInDependency("com.bepis.r2api")]
     [BepInPlugin("com.CwakrJax.FasterGames", "FasterGames", "0.3.0")]
     public class FasterGames : BaseUnityPlugin
     {
