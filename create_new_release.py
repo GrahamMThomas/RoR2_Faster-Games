@@ -9,7 +9,10 @@ print("Minor 0.X.0 = 2")
 print("Patch 0.0.X = 3")
 answer = input("Answer: ")
 
-last_release_name = os.listdir('releases')[1]
+last_releases = [x for x in os.listdir('releases') if '.zip' not in x]
+last_releases.sort()
+last_release_name = last_releases[-1]
+
 v_nums = re.match(r"faster\-games_(\d+)\-(\d+)\-(\d+)", last_release_name).groups()
 
 # Create new release name

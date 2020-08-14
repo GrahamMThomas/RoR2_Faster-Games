@@ -9,8 +9,6 @@ The mod tinkers with increasing a few attributes to make looting quicker while i
 
 Games should be about 2.5x-3x faster.
 
-Make sure you select `Faster` difficulty before playing with this mod. All members of your party must have the mod installed.
-
 
 ## Game modifications
 - Spawn rate increase
@@ -19,13 +17,12 @@ Make sure you select `Faster` difficulty before playing with this mod. All membe
 - Increase base speed (For faster looting)
 - Increase Difficulty Scaling
 - Increase Chest Spawn Rates
-- Increase Teleporter Charge Rate
-- Removes cooldown on 3d printers
-- Overhauled Chance Shrine
-	- 5 items
-	- Scaling per use increased
-	- No Cooldown
+
+## Recommended Mods
+- Infinite Chance (Set maximum items in config to ~5)
+- Faster Teleport Charge
+- Faster 3d printers
 
 ## Todo
-- Add icon to difficulty
+- Publish
 - Work on Balancing
