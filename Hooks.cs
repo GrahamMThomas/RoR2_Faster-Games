@@ -9,44 +9,44 @@ namespace FasterGames
     {
         public BepInEx.Logging.ManualLogSource pluginLogger;
 
-        public void IncreaseSpawnRate()
+        public void IncreaseSpawnRate(float spawnRate)
         {
             // Dunno if this is actually working...
-            pluginLogger.LogInfo("Increasing Spawn Rate");
             On.RoR2.CombatDirector.Simulate += (orig, self, deltaTime) =>
             {
-                self.minSeriesSpawnInterval = 2f; // Default is 0.1
-                self.maxSeriesSpawnInterval = 3f; // Default is 1
+                self.minSeriesSpawnInterval = 1f * (spawnRate * 0.8f); // Default is 0.1
+                self.maxSeriesSpawnInterval = 1f * spawnRate; // Default is 1
                 orig(self, deltaTime);
             };
+            pluginLogger.LogInfo($"Increased Spawn Rate: {spawnRate}x");
         }
 
-        public void IncreaseExpCoefficient()
+        public void IncreaseExpCoefficient(float baseExpMultiplier, float expPerPlayerMultiplier)
         {
-            pluginLogger.LogInfo("Increasing Exp Gain");
+            
             On.RoR2.CombatDirector.Simulate += (orig, self, deltaTime) =>
             {
                 self.expRewardCoefficient = new float();
-                self.expRewardCoefficient = 0.5f + Run.instance.participatingPlayerCount * 0.1f; // Default is 0.2
+                self.expRewardCoefficient = baseExpMultiplier / 5 + Run.instance.participatingPlayerCount * expPerPlayerMultiplier/5; // Default is 0.2
                 orig(self, deltaTime);
             };
+            pluginLogger.LogInfo($"Increased Exp Rate: {baseExpMultiplier}x; Per Player: {expPerPlayerMultiplier}x");
         }
 
-        public void IncreaseMoneyMultiplier()
+        public void IncreaseMoneyMultiplier(float baseMoney, float moneyPerPlayer)
         {
-            pluginLogger.LogInfo("Increasing Money on Kill");
             On.RoR2.CombatDirector.Simulate += (orig, self, deltaTime) =>
             {
                 self.creditMultiplier = new float();
-                self.creditMultiplier = 1.5f + Run.instance.participatingPlayerCount * 0.5f; // Default is 1
+                self.creditMultiplier = baseMoney + Run.instance.participatingPlayerCount * moneyPerPlayer; // Default is 1
                 orig(self, deltaTime);
             };
+            pluginLogger.LogInfo($"Increased Money on Kill: {baseMoney}x; Per Player: {moneyPerPlayer}x");
         }
 
-        public void IncreaseBaseStats()
+        public void IncreaseBaseStats(float moveSpeed)
         {
-            pluginLogger.LogInfo("Increasing Base Move Speed");
-            foreach (string bodyName in new string[] { "CommandoBody", "ToolbotBody", "HuntressBody", "EngiBody", "MageBody", "MercBody", "TreebotBody", "LoaderBody", "CrocoBody", "CaptainBody" })
+            foreach (string bodyName in new string[] { "CommandoBody", "ToolbotBody", "HuntressBody", "EngiBody", "MageBody", "MercBody", "TreebotBody", "LoaderBody", "CrocoBody", "CaptainBody", "SniperBody" })
             {
                 GameObject obj = Resources.Load<GameObject>($"Prefabs/CharacterBodies/{bodyName}");
                 if (obj)
@@ -54,28 +54,27 @@ namespace FasterGames
                     CharacterBody body = obj.GetComponent<CharacterBody>();
                     if (body)
                     {
-                        body.baseMoveSpeed = 10f; // Default is 7
+                        body.baseMoveSpeed = moveSpeed; // Default is 7
                     }
                     else
                     {
-                        pluginLogger.LogError("The prefab loaded has no character body");
+                        pluginLogger.LogWarning($"The prefab {bodyName} loaded has no character body");
                     }
                 }
                 else
                 {
-                    pluginLogger.LogError("That is not a valid prefab");
+                    pluginLogger.LogWarning($"That is not a valid prefab: {bodyName}");
                 }
             }
+            pluginLogger.LogInfo($"Increased Base Move Speed to {moveSpeed}");
         }
 
 
-        public void OverrideDifficulties()
+        public void OverrideDifficulties(float scalingMultiplier)
         {
-            pluginLogger.LogInfo("Overriding All Difficulties with Faster");
-
             Color DifficultyColor = new Color(0.94f, 0.51f, 0.15f);
             DifficultyDef FasterDifficulty = new DifficultyDef(
-                9f, //0 is Normal mode. 2.5f is 50% which is monsoon
+                (scalingMultiplier-1)*5, //0 is Normal mode. 2.5f is 50% which is monsoon
                 "Faster",
                 ":Assets/FasterGames/DifficultyIcon.png",
                 "Gotta go Fast!",
@@ -83,11 +82,14 @@ namespace FasterGames
                 "Gotta go Faster!",
                 true
                 );
+
             On.RoR2.DifficultyCatalog.GetDifficultyDef += (orig, self) =>
             {
                 return FasterDifficulty;
                 // orig(self);
             };
+
+            pluginLogger.LogInfo($"Overrided All Difficulties with Faster; Scaling Multiplier: {scalingMultiplier}x");
         }
 
         //Currently Borked
@@ -107,33 +109,29 @@ namespace FasterGames
                             false
                             );
             DifficultyIndex DelugeIndex = R2API.DifficultyAPI.AddDifficulty(FasterDef);
-            pluginLogger.LogInfo(DelugeIndex);
         }
 
-        public void IncreaseChestSpawnRate()
+        public void IncreaseChestSpawnRate(float baseInteractableMultiplier, float perPlayerInteractableMultiplier)
         {
-            pluginLogger.LogInfo("Increasing Chest Spawn Rate");
             On.RoR2.ClassicStageInfo.Awake += (On.RoR2.ClassicStageInfo.orig_Awake orig, ClassicStageInfo self) =>
             {
-                self.sceneDirectorInteractibleCredits = 400 + (Run.instance.participatingPlayerCount * 100); // Default is 200
+                self.sceneDirectorInteractibleCredits = (int)(200 * baseInteractableMultiplier) + (int)((Run.instance.participatingPlayerCount - 1) * 200 * perPlayerInteractableMultiplier); // Default is 200
                 orig(self);
             };
+            pluginLogger.LogInfo($"Increased Chest Spawn Rate: {baseInteractableMultiplier}x; Per Player: {perPlayerInteractableMultiplier}x");
         }
 
         // Credit to https://github.com/HimeTwyla/TwylaRoR2Mods/blob/master/InfiniteChance/InfiniteChance.cs
-        public void OverhaulChanceShrines()
+        public void OverhaulChanceShrines(int maxPurchases, float costMult)
         {
-            pluginLogger.LogInfo("Overhauling Chance Shrine");
-
-            int maxPurchases = 5;
-            float CostMult = 1.4f;
-
             // Increase Max Purchases and update Cost Scaling
             On.RoR2.ShrineChanceBehavior.Awake += (orig, self) =>
             {
                 orig(self);
                 self.maxPurchaseCount = maxPurchases;
-                HarmonyLib.AccessTools.Field(HarmonyLib.AccessTools.TypeByName("RoR2.ShrineChanceBehavior"), "costMultiplierPerPurchase").SetValue(self, CostMult);
+
+                // Default is 1.4
+                HarmonyLib.AccessTools.Field(HarmonyLib.AccessTools.TypeByName("RoR2.ShrineChanceBehavior"), "costMultiplierPerPurchase").SetValue(self, costMult);
             };
 
             // Remove timer on chance shrine
@@ -143,18 +141,20 @@ namespace FasterGames
                 HarmonyLib.AccessTools.Field(HarmonyLib.AccessTools.TypeByName("RoR2.ShrineChanceBehavior"), "refreshTimer").SetValue(self, 0f);
                 //self.SetFieldValue("refreshTimer", 0f);
             };
+
+            pluginLogger.LogInfo($"Overhauled Chance Shrine - Max Items: {maxPurchases}; Cost Multiplier: {costMult}x");
         }
 
         //Credit to https://thunderstore.io/package/der10pm/ChargeInHalf/
-        public void IncreaseTeleporterChargeSpeed()
+        public void IncreaseTeleporterChargeSpeed(float teleporterChargeMultiplier)
         {
-            pluginLogger.LogInfo("Increasing Teleporter Charge Speed");
-            
             On.RoR2.HoldoutZoneController.OnEnable += (orig, self) =>
             {
-                self.baseChargeDuration /= 1.5f;
+                self.baseChargeDuration /= teleporterChargeMultiplier;
                 orig(self);
             };
+
+            pluginLogger.LogInfo($"Increased Teleporter Charge Speed: {teleporterChargeMultiplier}x");
         }
     }
 
