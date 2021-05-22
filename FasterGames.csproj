@@ -5,11 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="assets\fastergames" />
     <None Remove="fastergames" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="fastergames" />
+    <EmbeddedResource Include="assets\fastergames" />
   </ItemGroup>
 
   <ItemGroup>

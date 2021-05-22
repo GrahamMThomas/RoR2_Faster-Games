@@ -55,10 +55,10 @@ namespace FasterGames
 
             Sprite diffIcon;
 
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("FasterGames.fastergames"))
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("FasterGames.assets.fastergames"))
             {
                 AssetBundle bundle = AssetBundle.LoadFromStream(stream);
-                diffIcon = bundle.LoadAsset<Sprite>("Assets/Import/difficulty_icon/difficulty_icon.png");
+                diffIcon = bundle.LoadAsset<Sprite>("Assets/Import/icons/FasterDifficultyIcon.png");
             }
 
             Color DifficultyColor = new Color(0.94f, 0.51f, 0.15f);
