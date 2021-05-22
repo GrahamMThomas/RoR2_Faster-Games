@@ -97,7 +97,7 @@ namespace FasterGames
                 orig(self);
                 if (NetworkServer.active)
                 {
-                    typeof(EntityStates.Duplicator.Duplicating).SetFieldValue("initialDelayDuration", 0f);
+                    typeof(EntityStates.Duplicator.Duplicating).SetFieldValue("initialDelayDuration", 0.1f);
                     typeof(EntityStates.Duplicator.Duplicating).SetFieldValue("timeBetweenStartAndDropDroplet", 0f);
                 }
             };
