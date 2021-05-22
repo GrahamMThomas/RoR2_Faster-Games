@@ -1,25 +1,13 @@
-﻿//using R2API.Utils;
-using RoR2;
+﻿using RoR2;
+using UnityEngine.Networking;
+using R2API.Utils;
 using UnityEngine;
-//using MonoMod.Cil;
 
 namespace FasterGames
 {
     public class Hooks
     {
         public BepInEx.Logging.ManualLogSource pluginLogger;
-
-        public void IncreaseSpawnRate(float spawnRate)
-        {
-            // Dunno if this is actually working...
-            On.RoR2.CombatDirector.Simulate += (orig, self, deltaTime) =>
-            {
-                self.minSeriesSpawnInterval = 1f * (spawnRate * 0.8f); // Default is 0.1
-                self.maxSeriesSpawnInterval = 1f * spawnRate; // Default is 1
-                orig(self, deltaTime);
-            };
-            pluginLogger.LogInfo($"Increased Spawn Rate: {spawnRate}x");
-        }
 
         public void IncreaseExpCoefficient(float baseExpMultiplier, float expPerPlayerMultiplier)
         {
@@ -46,69 +34,14 @@ namespace FasterGames
 
         public void IncreaseBaseStats(float moveSpeed)
         {
-            foreach (string bodyName in new string[] { "CommandoBody", "ToolbotBody", "HuntressBody", "EngiBody", "MageBody", "MercBody", "TreebotBody", "LoaderBody", "CrocoBody", "CaptainBody", "SniperBody" })
+            foreach (SurvivorDef survivor in RoR2.SurvivorCatalog.allSurvivorDefs)
             {
-                GameObject obj = Resources.Load<GameObject>($"Prefabs/CharacterBodies/{bodyName}");
-                if (obj)
-                {
-                    CharacterBody body = obj.GetComponent<CharacterBody>();
-                    if (body)
-                    {
-                        body.baseMoveSpeed = moveSpeed; // Default is 7
-                    }
-                    else
-                    {
-                        pluginLogger.LogWarning($"The prefab {bodyName} loaded has no character body");
-                    }
-                }
-                else
-                {
-                    pluginLogger.LogWarning($"That is not a valid prefab: {bodyName}");
-                }
+                CharacterBody body = survivor.bodyPrefab.GetComponent<CharacterBody>();
+
+                pluginLogger.LogInfo($"Updated speed for {body.name}");
+                body.baseMoveSpeed = moveSpeed; // Default is 7
             }
             pluginLogger.LogInfo($"Increased Base Move Speed to {moveSpeed}");
-        }
-
-
-        public void OverrideDifficulties(float scalingMultiplier)
-        {
-            Color DifficultyColor = new Color(0.94f, 0.51f, 0.15f);
-            DifficultyDef FasterDifficulty = new DifficultyDef(
-                (scalingMultiplier-1)*5, //0 is Normal mode. 2.5f is 50% which is monsoon
-                "Faster",
-                ":Assets/FasterGames/DifficultyIcon.png",
-                "Gotta go Fast!",
-                DifficultyColor,
-                "Gotta go Faster!",
-                true
-                );
-
-            On.RoR2.DifficultyCatalog.GetDifficultyDef += (orig, self) =>
-            {
-                return FasterDifficulty;
-                // orig(self);
-            };
-
-            pluginLogger.LogInfo($"Overrided All Difficulties with Faster; Scaling Multiplier: {scalingMultiplier}x");
-        }
-
-        //Currently Borked
-        public void IncreaseDifficultyScaling()
-        {
-            pluginLogger.LogInfo("Created Faster Difficulty");
-
-            Color DifficultyColor = new Color(0.94f, 0.51f, 0.15f);
-
-            DifficultyDef FasterDef = new DifficultyDef(
-                            9f, //0 is Normal mode. 2.5f is 50% which is monsoon
-                            "Faster",
-                            ":Assets/FasterGames/DifficultyIcon.png",
-                            "Gotta go Faster!",
-                            DifficultyColor,
-                            "Hurr Durr Dunno what to put here",
-                            false
-                            );
-            DifficultyIndex DelugeIndex = R2API.DifficultyAPI.AddDifficulty(FasterDef);
         }
 
         public void IncreaseChestSpawnRate(float baseInteractableMultiplier, float perPlayerInteractableMultiplier)
@@ -138,8 +71,7 @@ namespace FasterGames
             On.RoR2.ShrineChanceBehavior.AddShrineStack += (orig, self, interactor) =>
             {
                 orig(self, interactor);
-                HarmonyLib.AccessTools.Field(HarmonyLib.AccessTools.TypeByName("RoR2.ShrineChanceBehavior"), "refreshTimer").SetValue(self, 0f);
-                //self.SetFieldValue("refreshTimer", 0f);
+                HarmonyLib.AccessTools.Field(HarmonyLib.AccessTools.TypeByName("RoR2.ShrineChanceBehavior"), "refreshTimer").SetValue(self, 0.1f);
             };
 
             pluginLogger.LogInfo($"Overhauled Chance Shrine - Max Items: {maxPurchases}; Cost Multiplier: {costMult}x");
@@ -155,6 +87,39 @@ namespace FasterGames
             };
 
             pluginLogger.LogInfo($"Increased Teleporter Charge Speed: {teleporterChargeMultiplier}x");
+        }
+
+        //Credit to https://github.com/TheRealElysium/R2Mods/blob/master/Faster3DPrinters
+        public void NoCoolDown3dPrinter()
+        {
+            On.RoR2.Stage.Start += (orig, self) =>
+            {
+                orig(self);
+                if (NetworkServer.active)
+                {
+                    typeof(EntityStates.Duplicator.Duplicating).SetFieldValue("initialDelayDuration", 0f);
+                    typeof(EntityStates.Duplicator.Duplicating).SetFieldValue("timeBetweenStartAndDropDroplet", 0f);
+                }
+            };
+
+            On.EntityStates.Duplicator.Duplicating.DropDroplet += (orig, self) =>
+            {
+                orig(self);
+                if (NetworkServer.active)
+                {
+                    self.outer.GetComponent<PurchaseInteraction>().Networkavailable = true;
+                }
+            };
+
+            On.EntityStates.Duplicator.Duplicating.BeginCooking += (orig, self) =>
+            {
+                if (!NetworkServer.active)
+                {
+                    orig(self);
+                }
+            };
+
+            pluginLogger.LogInfo("Removed 3d printer cooldown");
         }
     }
 

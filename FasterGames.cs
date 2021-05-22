@@ -1,14 +1,14 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using RoR2;
-// using R2API.Utils;
+using R2API.Utils;
 using UnityEngine;
 
 namespace FasterGames
 {
-    //[R2APISubmoduleDependency("DifficultyAPI")]
-    //[BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.CwakrJax.FasterGames", "FasterGames", "0.4.0")]
+    [R2APISubmoduleDependency("DifficultyAPI")]
+    [BepInDependency("com.bepis.r2api")]
+    [BepInPlugin("com.CwakrJax.FasterGames", "FasterGames", "1.0.0")]
     public class FasterGames : BaseUnityPlugin
     {
 
@@ -40,22 +40,46 @@ namespace FasterGames
                 return;
             }
             string InitMesssage = "Your game is Faster!";
+            bool hasGameUpdated = false;
+
             Chat.AddMessage(InitMesssage);
             Logger.LogInfo(InitMesssage);
 
-            Hooks myHooks = new Hooks();
-            myHooks.pluginLogger = Logger;
-            myHooks.IncreaseSpawnRate(spawnRate.Value);
-            myHooks.IncreaseExpCoefficient(baseExpMultiplier.Value, expPerPlayerMultiplier.Value);
-            myHooks.IncreaseMoneyMultiplier(baseMoney.Value, moneyPerPlayer.Value);
-            myHooks.IncreaseBaseStats(moveSpeed.Value);
-            // myHooks.IncreaseDifficultyScaling();
-            myHooks.OverrideDifficulties(scalingPercentage.Value);
-            myHooks.IncreaseChestSpawnRate(baseInteractableMultiplier.Value, perPlayerInteractableMultiplier.Value);
-            myHooks.OverhaulChanceShrines(chanceShrineItemCount.Value, chanceShrineCostMultiplier.Value);
-            myHooks.IncreaseTeleporterChargeSpeed(teleporterChargeMultiplier.Value);
+            Color DifficultyColor = new Color(0.94f, 0.51f, 0.15f);
+            DifficultyDef FasterDifficulty = new DifficultyDef(
+                (scalingPercentage.Value - 1) * 5, //0 is Normal mode. 2.5f is 50% which is monsoon
+                "Faster",
+                ":Assets/FasterGames/DifficultyIcon.png",
+                "Gotta go Fast!",
+                DifficultyColor,
+                "Gotta go Faster!",
+                true
+                );
 
+            DifficultyIndex diffIndex = R2API.DifficultyAPI.AddDifficulty(FasterDifficulty);
 
+            RoR2.Run.onRunStartGlobal += (RoR2.Run run) => {
+                if (run.selectedDifficulty == diffIndex)
+                {
+                    Hooks myHooks = new Hooks();
+                    myHooks.pluginLogger = Logger;
+                    myHooks.IncreaseExpCoefficient(baseExpMultiplier.Value, expPerPlayerMultiplier.Value);
+                    myHooks.IncreaseMoneyMultiplier(baseMoney.Value, moneyPerPlayer.Value);
+                    myHooks.IncreaseBaseStats(moveSpeed.Value);
+                    myHooks.IncreaseChestSpawnRate(baseInteractableMultiplier.Value, perPlayerInteractableMultiplier.Value);
+                    myHooks.OverhaulChanceShrines(chanceShrineItemCount.Value, chanceShrineCostMultiplier.Value);
+                    myHooks.IncreaseTeleporterChargeSpeed(teleporterChargeMultiplier.Value);
+                    myHooks.NoCoolDown3dPrinter();
+                    hasGameUpdated = true;
+                }
+            };
+
+            RoR2.SteamworksLobbyManager.onLobbiesUpdated += () =>
+            {
+                if (hasGameUpdated) { 
+                    Chat.AddMessage("[WARN] If you plan on playing another difficulty, you must restart your game!");
+                }
+            };
         }
 
         public void InitConfig()
