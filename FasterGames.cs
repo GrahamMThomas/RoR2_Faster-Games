@@ -2,9 +2,13 @@
 using BepInEx.Configuration;
 using RoR2;
 using R2API.Utils;
-using R2API;
 using UnityEngine;
 using System.Reflection;
+using System.Security.Permissions;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+[assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
+#pragma warning restore CS0618 // Type or member is obsolete
 
 namespace FasterGames
 {
@@ -50,6 +54,7 @@ namespace FasterGames
             Logger.LogInfo(InitMesssage);
 
             Sprite diffIcon;
+
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("FasterGames.fastergames"))
             {
                 AssetBundle bundle = AssetBundle.LoadFromStream(stream);
@@ -61,28 +66,14 @@ namespace FasterGames
             DifficultyDef FasterDifficulty = new DifficultyDef(
                 (scalingPercentage.Value - 1) * 5, //0 is Normal mode. 2.5f is 50% which is monsoon
                 "Faster",
-                "@FasterGamesAssetBundler:Assets/Import/difficulty_icon/difficulty_icon.png",
+                "",
                 "Gotta go Fast!",
                 DifficultyColor,
                 "Gotta go Faster!",
                 true
                 );
 
-            On.RoR2.DifficultyDef.GetIconSprite += (orig, self) =>
-            {
-                if (hasGameUpdated)
-                {
-                    return diffIcon;
-                }
-                else
-                {
-                    return orig(self);
-                }
-            };
-
-
-
-            DifficultyIndex diffIndex = R2API.DifficultyAPI.AddDifficulty(FasterDifficulty);
+            DifficultyIndex diffIndex = R2API.DifficultyAPI.AddDifficulty(FasterDifficulty, diffIcon);
 
             RoR2.Run.onRunStartGlobal += (RoR2.Run run) => {
                 if (run.selectedDifficulty == diffIndex)
@@ -104,7 +95,7 @@ namespace FasterGames
             RoR2.SteamworksLobbyManager.onLobbiesUpdated += () =>
             {
                 if (hasGameUpdated) { 
-                    Chat.AddMessage("[WARN] If you plan on playing another difficulty, you must restart your game!");
+                    Chat.AddMessage("[WARN] If you plan on playing different difficulty, you must restart your game!");
                 }
             };
         }
