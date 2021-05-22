@@ -9,6 +9,18 @@ namespace FasterGames
     {
         public BepInEx.Logging.ManualLogSource pluginLogger;
 
+        public void IncreaseSpawnRate()
+        {
+            // Dunno if this is actually working...
+            On.RoR2.CombatDirector.Simulate += (orig, self, deltaTime) =>
+            {
+                self.minRerollSpawnInterval = 1f;
+                self.maxRerollSpawnInterval = 4f;
+                orig(self, deltaTime);
+            };
+            pluginLogger.LogInfo($"Increased Spawn Rate");
+        }
+
         public void IncreaseExpCoefficient(float baseExpMultiplier, float expPerPlayerMultiplier)
         {
             

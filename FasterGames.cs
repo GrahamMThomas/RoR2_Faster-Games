@@ -2,7 +2,9 @@
 using BepInEx.Configuration;
 using RoR2;
 using R2API.Utils;
+using R2API;
 using UnityEngine;
+using System.Reflection;
 
 namespace FasterGames
 {
@@ -32,6 +34,8 @@ namespace FasterGames
         public static ConfigEntry<float> chanceShrineCostMultiplier { get; set; }
 
         public static ConfigEntry<float> teleporterChargeMultiplier { get; set; }
+
+        [System.Obsolete]
         public void Awake()
         {
             InitConfig();
@@ -45,16 +49,38 @@ namespace FasterGames
             Chat.AddMessage(InitMesssage);
             Logger.LogInfo(InitMesssage);
 
+            Sprite diffIcon;
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("FasterGames.fastergames"))
+            {
+                AssetBundle bundle = AssetBundle.LoadFromStream(stream);
+                diffIcon = bundle.LoadAsset<Sprite>("Assets/Import/difficulty_icon/difficulty_icon.png");
+            }
+
             Color DifficultyColor = new Color(0.94f, 0.51f, 0.15f);
+
             DifficultyDef FasterDifficulty = new DifficultyDef(
                 (scalingPercentage.Value - 1) * 5, //0 is Normal mode. 2.5f is 50% which is monsoon
                 "Faster",
-                ":Assets/FasterGames/DifficultyIcon.png",
+                "@FasterGamesAssetBundler:Assets/Import/difficulty_icon/difficulty_icon.png",
                 "Gotta go Fast!",
                 DifficultyColor,
                 "Gotta go Faster!",
                 true
                 );
+
+            On.RoR2.DifficultyDef.GetIconSprite += (orig, self) =>
+            {
+                if (hasGameUpdated)
+                {
+                    return diffIcon;
+                }
+                else
+                {
+                    return orig(self);
+                }
+            };
+
+
 
             DifficultyIndex diffIndex = R2API.DifficultyAPI.AddDifficulty(FasterDifficulty);
 
@@ -63,6 +89,7 @@ namespace FasterGames
                 {
                     Hooks myHooks = new Hooks();
                     myHooks.pluginLogger = Logger;
+                    myHooks.IncreaseSpawnRate();
                     myHooks.IncreaseExpCoefficient(baseExpMultiplier.Value, expPerPlayerMultiplier.Value);
                     myHooks.IncreaseMoneyMultiplier(baseMoney.Value, moneyPerPlayer.Value);
                     myHooks.IncreaseBaseStats(moveSpeed.Value);
@@ -89,13 +116,6 @@ namespace FasterGames
                 "isModEnabled",
                 true,
                 "Turn this off if you want to play the game normally again. \nBut why would you?"
-            );
-
-            spawnRate = Config.Bind<float>(
-                "Game",
-                "mobSpawnRate",
-                3f,
-                "It's unclear how this works to me. \nBase Game value: 1"
             );
 
             baseExpMultiplier = Config.Bind<float>(
