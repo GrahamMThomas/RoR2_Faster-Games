@@ -47,29 +47,25 @@ namespace FasterGames
             {
                 return;
             }
-            string InitMesssage = "Your game is Faster!";
-            bool hasGameUpdated = false;
-
-            Chat.AddMessage(InitMesssage);
-            Logger.LogInfo(InitMesssage);
+            string InitMessage = "Your game is Faster!";
+            Logger.LogInfo(InitMessage);
 
             Sprite diffIcon;
-
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("FasterGames.assets.fastergames"))
             {
                 AssetBundle bundle = AssetBundle.LoadFromStream(stream);
                 diffIcon = bundle.LoadAsset<Sprite>("Assets/Import/icons/FasterDifficultyIcon.png");
             }
 
-            Color DifficultyColor = new Color(0.94f, 0.51f, 0.15f);
+            Color DifficultyColor = new Color(0.875f, 0.875f, 0.14f);
 
             DifficultyDef FasterDifficulty = new DifficultyDef(
                 (scalingPercentage.Value - 1) * 5, //0 is Normal mode. 2.5f is 50% which is monsoon
                 "Faster",
                 "",
-                "Gotta go Fast!",
+                GenerateDifficultyDescription(),
                 DifficultyColor,
-                "Gotta go Faster!",
+                "Faster",
                 true
                 );
 
@@ -78,6 +74,7 @@ namespace FasterGames
             RoR2.Run.onRunStartGlobal += (RoR2.Run run) => {
                 if (run.selectedDifficulty == diffIndex)
                 {
+                    ChatMessage.SendColored(InitMessage, new Color(0.78f, 0.788f, 0.3f));
                     Hooks myHooks = new Hooks();
                     myHooks.pluginLogger = Logger;
                     myHooks.IncreaseSpawnRate();
@@ -88,14 +85,7 @@ namespace FasterGames
                     myHooks.OverhaulChanceShrines(chanceShrineItemCount.Value, chanceShrineCostMultiplier.Value);
                     myHooks.IncreaseTeleporterChargeSpeed(teleporterChargeMultiplier.Value);
                     myHooks.NoCoolDown3dPrinter();
-                    hasGameUpdated = true;
-                }
-            };
-
-            RoR2.SteamworksLobbyManager.onLobbiesUpdated += () =>
-            {
-                if (hasGameUpdated) { 
-                    Chat.AddMessage("[WARN] If you plan on playing different difficulty, you must restart your game!");
+                    ChatMessage.SendColored("[FasterGames] If you plan on playing different difficulty, you must restart your game!", new Color(0.78f, 0.788f, 0.3f));
                 }
             };
         }
@@ -185,6 +175,24 @@ namespace FasterGames
                 1.5f,
                 "Increases Speed of Teleporter Charge.  \nBase Game value: 1"
             );
+        }
+
+        public string GenerateDifficultyDescription()
+        {
+            string desc = "Games go 3x faster. For those who love the game, but not how long it takes.\n<style=cStack>";
+            desc = string.Join("\n",
+                desc,
+                $"> Difficulty Scaling: <style=cDeath>+{(scalingPercentage.Value - 1) * 100}%</style>\n",
+                "<style=cIsHealing>+</style> Exp Rate",
+                "<style=cIsHealing>+</style> Money on Kill",
+                "<style=cIsHealing>+</style> Base Move Speed",
+                "<style=cIsHealing>+</style> Interactable Spawn Rate",
+                "<style=cIsHealing>+</style> Max items from Chance Shrine\n",
+                "> Reduces Teleporter Charge Time", 
+                "> Spammable Printers and Chance Shrines</style>",
+                "\nThese values can be changed in the mod config.");
+
+            return desc;
         }
     }
 }
