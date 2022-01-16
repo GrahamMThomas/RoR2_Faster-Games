@@ -26,7 +26,8 @@ Make sure you select `Faster` difficulty before playing with this mod. All membe
 	- No Cooldown
 - Removes 3d printing cooldown
 
+## Recommended Mods
+`FasterGames.r2z` Added for my recommended mods to play with this mod.
+
 ## Todo
-- Get Icon working in difficulty selection carousel
 - Work on Balancing
-- Make teleporter charging get faster as the game goes on
