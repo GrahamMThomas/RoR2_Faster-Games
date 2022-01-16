@@ -31,3 +31,4 @@ Make sure you select `Faster` difficulty before playing with this mod. All membe
 
 ## Todo
 - Work on Balancing
+	- Please add an issue with you recommended balance changes!
