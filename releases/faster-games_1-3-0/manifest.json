@@ -1,0 +1,12 @@
+{
+    "name": "FasterGames",
+    "version_number": "1.3.0",
+    "website_url": "https://github.com/GrahamMThomas/RoR2_Faster-Games",
+    "description": "Games take to long? Runs are 3x faster! Completely destroying the balance of the original game.",
+    "dependencies": [
+        "bbepis-BepInExPack-5.4.2103",
+        "RiskofThunder-HookGenPatcher-1.2.3",
+        "tristanmcpherson-R2API-4.4.1", 
+        "XoXFaby-MMHOOK_Standalone-1.0.3"
+    ]
+}

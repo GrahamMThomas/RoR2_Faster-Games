@@ -3,8 +3,11 @@ using BepInEx.Configuration;
 using RoR2;
 using R2API.Utils;
 using UnityEngine;
-using System.Reflection;
 using System.Security.Permissions;
+using System.Reflection;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
@@ -17,6 +20,7 @@ namespace FasterGames
     [BepInPlugin("com.CwakrJax.FasterGames", "FasterGames", "1.0.0")]
     public class FasterGames : BaseUnityPlugin
     {
+        public static AssetBundle MainAssets;
 
         public static ConfigEntry<bool> IsModEnabled { get; set; }
         public static ConfigEntry<float> spawnRate { get; set; }
@@ -39,6 +43,9 @@ namespace FasterGames
 
         public static ConfigEntry<float> teleporterChargeMultiplier { get; set; }
 
+
+        public List<ArtifactBase> Artifacts = new List<ArtifactBase>();
+
         [System.Obsolete]
         public void Awake()
         {
@@ -50,41 +57,53 @@ namespace FasterGames
             string InitMessage = "Your game is Faster!";
             Logger.LogInfo(InitMessage);
 
-            Sprite diffIcon;
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("FasterGames.assets.fastergames"))
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("FasterGames.assets.assetbundle"))
             {
-                AssetBundle bundle = AssetBundle.LoadFromStream(stream);
-                diffIcon = bundle.LoadAsset<Sprite>("Assets/Import/icons/FasterDifficultyIcon.png");
+                MainAssets = AssetBundle.LoadFromStream(stream);
             }
 
-            Color DifficultyColor = new Color(0.875f, 0.875f, 0.14f);
+            DifficultyIndex diffIndex = FasterGamesDifficulty.AddDifficulty(scalingPercentage.Value);
 
-            DifficultyDef FasterDifficulty = new DifficultyDef(
-                (scalingPercentage.Value - 1) * 5, //0 is Normal mode. 2.5f is 50% which is monsoon
-                "Faster",
-                "",
-                GenerateDifficultyDescription(),
-                DifficultyColor,
-                "Faster",
-                true
-                );
+            NoChestArtifact noChestArtifact = null;
 
-            DifficultyIndex diffIndex = R2API.DifficultyAPI.AddDifficulty(FasterDifficulty, diffIcon);
+            var ArtifactTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(ArtifactBase)));
+            foreach (var artifactType in ArtifactTypes)
+            {
+                ArtifactBase artifact = (ArtifactBase)Activator.CreateInstance(artifactType);
+                if (ValidateArtifact(artifact, Artifacts))
+                {
+                    artifact.Init(Config, Logger);
+                }
+                if (artifactType == typeof(NoChestArtifact))
+                {
+                    noChestArtifact = (NoChestArtifact)artifact;
+                }
+            }
 
-            RoR2.Run.onRunStartGlobal += (RoR2.Run run) => {
+            // NoChestArtifact noChestArtifact = new NoChestArtifact();
+
+            RoR2.Run.onRunStartGlobal += (RoR2.Run run) =>
+            {
                 if (run.selectedDifficulty == diffIndex)
                 {
                     ChatMessage.SendColored(InitMessage, new Color(0.78f, 0.788f, 0.3f));
                     Hooks myHooks = new Hooks();
                     myHooks.pluginLogger = Logger;
-                    myHooks.IncreaseSpawnRate();
-                    myHooks.IncreaseExpCoefficient(baseExpMultiplier.Value, expPerPlayerMultiplier.Value);
-                    myHooks.IncreaseMoneyMultiplier(baseMoney.Value, moneyPerPlayer.Value);
-                    myHooks.IncreaseBaseStats(moveSpeed.Value);
-                    myHooks.IncreaseChestSpawnRate(baseInteractableMultiplier.Value, perPlayerInteractableMultiplier.Value);
-                    myHooks.OverhaulChanceShrines(chanceShrineItemCount.Value, chanceShrineCostMultiplier.Value);
-                    myHooks.IncreaseTeleporterChargeSpeed(teleporterChargeMultiplier.Value);
+                    if (noChestArtifact.ArtifactEnabled)
+                    {
+                        Logger.LogInfo("NoChestArtifact is enabled. Disabling chest based hooks");
+                    }
+                    else
+                    {
+                        myHooks.IncreaseExpCoefficient(baseExpMultiplier.Value, expPerPlayerMultiplier.Value);
+                        myHooks.IncreaseMoneyMultiplier(baseMoney.Value, moneyPerPlayer.Value);
+                        myHooks.IncreaseChestSpawnRate(baseInteractableMultiplier.Value, perPlayerInteractableMultiplier.Value);
+                        myHooks.OverhaulChanceShrines(chanceShrineItemCount.Value, chanceShrineCostMultiplier.Value);
+                    }
                     myHooks.NoCoolDown3dPrinter();
+                    // myHooks.IncreaseSpawnSpeed();
+                    myHooks.IncreaseBaseStats(moveSpeed.Value);
+                    myHooks.IncreaseTeleporterChargeSpeed(teleporterChargeMultiplier.Value);
                     ChatMessage.SendColored("[FasterGames] If you plan on playing different difficulty, you must restart your game!", new Color(0.78f, 0.788f, 0.3f));
                 }
             };
@@ -109,7 +128,7 @@ namespace FasterGames
             expPerPlayerMultiplier = Config.Bind<float>(
                 "Player",
                 "expPerPlayerMultiplier",
-                0.5f,
+                0f,
                 "Extra Exp Per player. Helps with multiplayer scaling. \nBase Game value: 0"
             );
 
@@ -137,7 +156,7 @@ namespace FasterGames
             scalingPercentage = Config.Bind<float>(
                 "Game",
                 "scalingIncreaseMultiplier",
-                2.75f,
+                3f,
                 "Increases game scaling. \nNormal Mode value: 1 \nMonsoon value: 1.5"
             );
 
@@ -172,27 +191,19 @@ namespace FasterGames
             teleporterChargeMultiplier = Config.Bind<float>(
                 "Game",
                 "teleporterChargeSpeedMultiplier",
-                1.5f,
+                2.5f,
                 "Increases Speed of Teleporter Charge.  \nBase Game value: 1"
             );
         }
 
-        public string GenerateDifficultyDescription()
+        public bool ValidateArtifact(ArtifactBase artifact, List<ArtifactBase> artifactList)
         {
-            string desc = "Games go 3x faster. For those who love the game, but not how long it takes.\n<style=cStack>";
-            desc = string.Join("\n",
-                desc,
-                $"> Difficulty Scaling: <style=cDeath>+{(scalingPercentage.Value - 1) * 100}%</style>\n",
-                "<style=cIsHealing>+</style> Exp Rate",
-                "<style=cIsHealing>+</style> Money on Kill",
-                "<style=cIsHealing>+</style> Base Move Speed",
-                "<style=cIsHealing>+</style> Interactable Spawn Rate",
-                "<style=cIsHealing>+</style> Max items from Chance Shrine\n",
-                "> Reduces Teleporter Charge Time", 
-                "> Spammable Printers and Chance Shrines</style>",
-                "\nThese values can be changed in the mod config.");
-
-            return desc;
+            var enabled = Config.Bind<bool>("Artifact: " + artifact.ArtifactName, "Enable Artifact?", true, "Should this artifact appear for selection?").Value;
+            if (enabled)
+            {
+                artifactList.Add(artifact);
+            }
+            return enabled;
         }
     }
 }

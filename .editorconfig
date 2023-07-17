@@ -1,0 +1,2 @@
+[*.{cs,vb}]
+dotnet_diagnostic.Publicizer001.severity = none 

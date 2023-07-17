@@ -1,0 +1,20 @@
+ManifestFileVersion: 0
+CRC: 2187405506
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 3092ead30495cf79b767b81afd48c4af
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: ea5a42e0fd8ea905efa7aa926a3b8944
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/icons/Enabled_Artifact_Icon.png
+- Assets/icons/FasterDifficultyIcon_V2.png
+- Assets/icons/Disabled_Artifact_Icon.png
+Dependencies: []

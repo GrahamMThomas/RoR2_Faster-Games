@@ -1,0 +1,47 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/FasterGames.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/FasterGames.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/FasterGames.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "install",
+            "type": "shell",
+            "command": "cp bin/Debug/netstandard2.0/FasterGames.dll /mnt/c/Users/Graham/AppData/Roaming/r2modmanPlus-local/RiskOfRain2/profiles/FasterGames/BepInEx/plugins/GrahamMThomas-FasterGames/FasterGames.dll",
+            "problemMatcher": "$msCompile"
+        },
+    ]
+}
